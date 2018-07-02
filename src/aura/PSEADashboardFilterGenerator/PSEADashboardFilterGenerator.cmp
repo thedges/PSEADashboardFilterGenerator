@@ -1,4 +1,4 @@
-<aura:component controller="PSWaveDashboardFilterGeneratorController" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
+<aura:component controller="PSEADashboardFilterGeneratorController" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
     access="global">
 
     <!-- Global objects -->
