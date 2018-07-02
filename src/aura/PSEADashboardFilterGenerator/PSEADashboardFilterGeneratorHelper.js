@@ -149,12 +149,13 @@
                 console.log('helper.getDatasetXMDS response...');
                 self.hideSpinner(component);
                 var idx = component.get("v.selIndex");
+                console.log('idx=' + idx);
                 var filters = component.get("v.filters");
-                //console.log('filters=' + JSON.stringify(filters));
+                console.log('filters=' + JSON.stringify(filters));
                 var resp = actionResult.getReturnValue();
-                //console.log('selDatasetXMDS=' + JSON.stringify(resp));
+                console.log('selDatasetXMDS=' + JSON.stringify(resp));
                 filters[idx].selDatasetXMDS = resp;
-                //console.log('filters=' + JSON.stringify(filters));
+                console.log('filters=' + JSON.stringify(filters));
                 component.set("v.filters", filters);
             }
             else {

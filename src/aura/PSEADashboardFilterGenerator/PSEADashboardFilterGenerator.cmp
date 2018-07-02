@@ -149,8 +149,13 @@
                                 </td>
 
                                 <td>
+                                    <!-- ***************************************************************************** -->
+                                    <!-- Had to switch to using the ui:inputSelect below due to some weird error being -->
+                                    <!-- thrown by using this ligghtning:select with aura:if logic inside              -->
+                                    <!-- ***************************************************************************** -->
+                                    <!-- 
                                         <lightning:select variant="label-hidden" value="{!filter.selDatasetFieldName}" onchange="{!c.onFiltersChange}">
-                                                <option value="" text="-- None --"/>
+                                                <option value="" text="- None -"/>
                                                 <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
                                                     <aura:iteration items="{!filter.selDatasetXMDS.dimensions}" var="fld">
                                                         <aura:if isTrue="{!fld.field == fld.label}">
@@ -172,9 +177,10 @@
                                                     </aura:iteration>
                                                 </aura:if>
                                         </lightning:select>
-                                    <!--
+                                    -->
+                                   
                                     <ui:inputSelect labelClass="{!idx}" value="{!filter.selDatasetFieldName}" change="{!c.onFiltersChange}">
-                                        <ui:inputSelectOption text="" label="- None -" />
+                                        <ui:inputSelectOption text="" label="-- None --" />
                                         <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
                                             <aura:iteration items="{!filter.selDatasetXMDS.dimensions}" var="fld">
                                                 <aura:if isTrue="{!fld.field == fld.label}">
@@ -196,10 +202,11 @@
                                             </aura:iteration>
                                         </aura:if>
                                     </ui:inputSelect>
-                                    -->
+                                   
                                 </td>
 
                                 <td>
+                                    
                                         <lightning:select variant="label-hidden" value="{!filter.selOperation}" onchange="{!c.onFiltersChange}">
                                                 <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
                                                         <option value="matches" text="matches" />
@@ -214,6 +221,7 @@
                                                         <option value="&lt;" text="&lt;" />
                                                     </aura:if>
                                         </lightning:select>
+
                                     <!--
                                     <ui:inputSelect value="{!filter.selOperation}" change="{!c.onFiltersChange}">
                                         <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
@@ -229,7 +237,7 @@
                                             <ui:inputSelectOption text="&lt;" label="&lt;" />
                                         </aura:if>
                                     </ui:inputSelect>
-                                -->
+                                    -->
                                 </td>
 
                                 <td>
@@ -266,6 +274,7 @@
                     </table>
                     <div class="slds-grid slds-grid_align-center slds-p-top_medium">
                         <lightning:button variant="brand" label="Add" title="Add a filter" onclick="{! c.addFilter }" />
+                        <!-- <lightning:button variant="brand" label="Reset" title="Reset" onclick="{! c.reset }" /> -->
                     </div>
                 </fieldset>
             </div>

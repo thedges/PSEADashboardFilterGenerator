@@ -77,12 +77,12 @@
 		console.log('idx=' + idx);
 		var filters = component.get("v.filters");
 
-		filters.splice(idx, 1);
+		//filters.splice(idx, 1);
 		//console.log('filters=' + JSON.stringify(filters));
-		component.set("v.filters", filters);
+		//component.set("v.filters", filters);
 
-		/*
-		var newFilters = [];
+	
+        var newFilters = [];
 		for (var i = 0; i < filters.length; i++) {
 			if (i != idx)
 			{
@@ -92,7 +92,7 @@
 		//component.set("v.filters", []);
 		console.log('newFilters=' + JSON.stringify(newFilters));
 		component.set("v.filters", newFilters);
-		*/
+
 	},
 	onDatasetChange: function (component, event, helper) {
 		console.log('onDatasetChange invoked...');
@@ -182,7 +182,11 @@
 		{
 			if (filterJSON != null) filterJSON.value = "";
 		}
-	}
+	},
+    reset: function (component, event, helper) {
+        component.set("v.filters", []);
+        helper.getDashboards(component);
+    }
 
 
 })
