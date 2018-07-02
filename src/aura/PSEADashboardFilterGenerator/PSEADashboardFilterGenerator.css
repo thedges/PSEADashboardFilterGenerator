@@ -1,0 +1,23 @@
+.THIS #jsonContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.THIS #copyButton {
+    position: absolute; top: 0px; right: 0px; z-index: 5; padding: 3px; 
+}
+
+.THIS .slds-card__header
+{
+    display: none;
+}
+
+.THIS .slds-text-heading--medium
+{
+    font-size: 1.0rem!important;
+}
+
+.THIS table .slds-form-element__label {
+    display : none;
+    visibility : hidden;
+}

@@ -1,0 +1,15 @@
+<apex:page >
+    <script>
+        var url = window.location.href;
+        var arr = url.split("/");
+        var dotarr = arr[2].split(".");
+    
+        var lexOrigin = "https://" + dotarr[0] + ".lightning.force.com";
+    
+        var message = {
+            name: "PSWaveDashboardFilterGenerator",
+            payload: '{!$Api.Session_ID}'
+        };
+        parent.postMessage(message, lexOrigin);
+</script>
+</apex:page>

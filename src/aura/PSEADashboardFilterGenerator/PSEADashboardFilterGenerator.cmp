@@ -1,0 +1,293 @@
+<aura:component controller="PSWaveDashboardFilterGeneratorController" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
+    access="global">
+
+    <!-- Global objects -->
+    <aura:attribute name="dashboards" type="List" />
+    <aura:attribute name="selDashboardId" type="String" />
+    <aura:attribute name="selDashboardDef" type="Object" />
+    <aura:attribute name="objects" type="List" />
+    <aura:attribute name="selObjectName" type="String" />
+    <aura:attribute name="selObjectDef" type="Object" />
+
+    <aura:attribute name="filters" type="List" default="[]"/>
+
+    <!-- Repeat -->
+    <aura:attribute name="selDatasetId" type="String" />
+    <aura:attribute name="selDatasetDef" type="Object" />
+    <aura:attribute name="selDatasetXMDS" type="Object" />
+    <aura:attribute name="selDatasetFieldName" type="String" />
+    <aura:attribute name="selFieldName" type="String" />
+    <aura:attribute name="selFieldType" type="String" />
+    <aura:attribute name="selOperation" type="String" />
+
+    <aura:attribute name="selIndex" type="String" />
+
+    <aura:attribute name="sessionId" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:handler name="change" value="{!v.selDashboardId}" action="{!c.onDashboardSel}" />
+    <aura:handler name="change" value="{!v.selObjectName}" action="{!c.onObjectSel}" />
+    <!-- <aura:handler name="change" value="{!v.selDatasetId}" action="{!c.onDatasetSel}" />  -->
+    <aura:handler name="change" value="{!v.filters}" action="{!c.onFiltersChange}" />
+
+    <aura:attribute name="IsSpinner" type="Boolean" default="false" />
+
+    <!-- ************************************************************************************************************** -->
+    <!-- This component makes Einstein Analytics (Wave) API calls. One problem is that one cannot use the user session  -->
+    <!-- from Lightning Components to call a Einsteing Analytics API. The correct approach is to use a Named Credential -->
+    <!-- in an Apex class and make the API call using those secure credentials.                                         -->
+    <!--  https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/apex_api_calls.htm                 -->
+    <!--                                                                                                                -->
+    <!-- I chose the below approach as I wanted this component to be easily to install and use for the user. I didn't   -->
+    <!-- want to burden them with having to setup Named Credential, Auth Providers, etc... which can be tedious         -->
+    <!--                                                                                                                -->
+    <!-- WARNING: Since the component is only being used internal to Salesforce and for demo purposes, it uses an       -->
+    <!-- means to get the Apex/VF session id to be able to call Einsteing Analytics. At the bottom of this component    -->
+    <!-- you will see an iframe for the PSGetSessionIdVF page. When this Apex page loads, it publish an event back to   -->
+    <!-- the Lightning Component with the Apex/VF page session id. This id can then be used to send to Apex for API     -->
+    <!-- calls for Einstein Analytic info (dashboards, datasets, XMDS, etc...). I wouldn't recommend this approach for  -->
+    <!-- production components. Inspiration for this approach was from Christophe's article here (see his Important     -->
+    <!-- Security Consideration at the bottom of the article):                                                          -->
+    <!-- https://developer.salesforce.com/blogs/developer-relations/2017/01/lightning-visualforce-communication.html    -->
+    <!-- ************************************************************************************************************** -->
+    <!-- <div class="slds-card" style="border: none;border-radius: 4px;" aura:id="timelineContainer" id="timelineContainer"> -->
+    <lightning:card>
+        <aura:if isTrue="{!v.IsSpinner}">
+            <lightning:spinner variant="brand" size="large" />
+        </aura:if>
+
+        <div class="slds-p-around_medium">
+            <div class="slds-p-bottom_large" style="text-align: center;">
+            <span style="font-family: 'Salesforce Sans',Arial,sans-serif;font-weight: bold;color:#00a0de;font-size: 1.25rem;">EA Dashboard Filter Generator</span>
+           </div>
+            <div class="slds-p-bottom_large">
+                <fieldset class="slds-box slds-theme--default ">
+                    <legend class="slds-text-heading--medium ">
+                        <span style="font-weight:bold">1. Select your Dashboard and Object</span>
+                    </legend>
+
+                    <div class="slds-grid slds-gutters slds-grid_align-center slds-grid_align-space ">
+                        <div class="slds-col">
+                            <lightning:select name="dashboardSel" label="Select a dashboard:" value="{!v.selDashboardId}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.dashboards}" var="dash">
+                                    <option value="{!dash.id}" text="{!dash.label}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div class="slds-col">
+                            <lightning:select name="objectSel" label="Select a object:" value="{!v.selObjectName}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.objects}" var="obj">
+                                    <option value="{!obj.name}" text="{!obj.label}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="slds-p-bottom_large">
+                <fieldset class="slds-box slds-theme--default">
+                    <legend class="slds-text-heading--medium ">
+                        <span style="font-weight:bold">2. Build your filters</span>
+                    </legend>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col">
+                                    <div class="slds-truncate">Select a dataset</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Field Type">Field Type</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Dataset Field">Dataset Field</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Operation">Operation</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Object Field">Object Field</div>
+                                </th>
+                                <th scope="col">
+                                        <div class="slds-truncate" title="Selection">Selection?</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <aura:iteration items="{!v.filters}" var="filter" indexVar="idx">
+                            <tr>
+                                <td>
+                                    <lightning:select name="{!idx}" variant="label-hidden" value="{!filter.selDatasetId}" onchange="{!c.onDatasetChange}">
+                                            <option value="" text="-- None --"/>
+                                            <aura:iteration items="{!v.selDashboardDef.datasets}" var="ds">
+                                              <option value="{!ds.id}" text="{!ds.label}" />
+                                            </aura:iteration>   
+                                    </lightning:select>
+                                    <!--
+                                    <ui:inputSelect labelClass="{!idx}" value="{!filter.selDatasetId}" change="{!c.onDatasetChange}">
+                                        <ui:inputSelectOption text="" label="- None -" />
+                                        <aura:iteration items="{!v.selDashboardDef.datasets}" var="ds">
+                                            <ui:inputSelectOption text="{!ds.id}" label="{!ds.label}" />
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                    -->
+                                </td>
+
+                                <td>
+                                        <lightning:select name="{!idx}" variant="label-hidden" value="{!filter.selFieldType}" onchange="{!c.onMeasureChange}">
+                                                <option value="dimension" text="dimension"/>
+                                                <option value="measure" text="measure"/>
+                                        </lightning:select>
+                                    <!--
+                                    <ui:inputSelect labelClass="{!idx}" value="{!filter.selFieldType}" change="{!c.onMeasureChange}">
+                                        <ui:inputSelectOption text="dimension" label="dimension" />/
+                                        <ui:inputSelectOption text="measure" label="measure" />/
+                                    </ui:inputSelect>
+                                    -->
+                                </td>
+
+                                <td>
+                                        <lightning:select variant="label-hidden" value="{!filter.selDatasetFieldName}" onchange="{!c.onFiltersChange}">
+                                                <option value="" text="-- None --"/>
+                                                <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
+                                                    <aura:iteration items="{!filter.selDatasetXMDS.dimensions}" var="fld">
+                                                        <aura:if isTrue="{!fld.field == fld.label}">
+                                                            <option value="{!fld.field}" text="{!fld.label}" />
+                                                        </aura:if>
+                                                        <aura:if isTrue="{!fld.field != fld.label}">
+                                                            <option value="{!fld.field}" text="{!fld.label + ' (' + fld.field + ')'}" />
+                                                        </aura:if>
+                                                    </aura:iteration>
+                                                </aura:if>
+                                                <aura:if isTrue="{!filter.selFieldType == 'measure'}">
+                                                    <aura:iteration items="{!filter.selDatasetXMDS.measures}" var="fld">
+                                                        <aura:if isTrue="{!fld.field == fld.label}">
+                                                            <option value="{!fld.field}" text="{!fld.label}" />
+                                                        </aura:if>
+                                                        <aura:if isTrue="{!fld.field != fld.label}">
+                                                            <option value="{!fld.field}" text="{!fld.label + ' (' + fld.field + ')'}" />
+                                                        </aura:if>
+                                                    </aura:iteration>
+                                                </aura:if>
+                                        </lightning:select>
+                                    <!--
+                                    <ui:inputSelect labelClass="{!idx}" value="{!filter.selDatasetFieldName}" change="{!c.onFiltersChange}">
+                                        <ui:inputSelectOption text="" label="- None -" />
+                                        <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
+                                            <aura:iteration items="{!filter.selDatasetXMDS.dimensions}" var="fld">
+                                                <aura:if isTrue="{!fld.field == fld.label}">
+                                                    <ui:inputSelectOption text="{!fld.field}" label="{!fld.label}" />
+                                                </aura:if>
+                                                <aura:if isTrue="{!fld.field != fld.label}">
+                                                    <ui:inputSelectOption text="{!fld.field}" label="{!fld.label + ' (' + fld.field + ')'}" />
+                                                </aura:if>
+                                            </aura:iteration>
+                                        </aura:if>
+                                        <aura:if isTrue="{!filter.selFieldType == 'measure'}">
+                                            <aura:iteration items="{!filter.selDatasetXMDS.measures}" var="fld">
+                                                <aura:if isTrue="{!fld.field == fld.label}">
+                                                    <ui:inputSelectOption text="{!fld.field}" label="{!fld.label}" />
+                                                </aura:if>
+                                                <aura:if isTrue="{!fld.field != fld.label}">
+                                                    <ui:inputSelectOption text="{!fld.field}" label="{!fld.label + ' (' + fld.field + ')'}" />
+                                                </aura:if>
+                                            </aura:iteration>
+                                        </aura:if>
+                                    </ui:inputSelect>
+                                    -->
+                                </td>
+
+                                <td>
+                                        <lightning:select variant="label-hidden" value="{!filter.selOperation}" onchange="{!c.onFiltersChange}">
+                                                <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
+                                                        <option value="matches" text="matches" />
+                                                        <option value="in" text="in" />
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!filter.selFieldType == 'measure'}">
+                                                        <option value="not in" text="not in" />
+                                                        <option value="==" text="==" />
+                                                        <option value=">=" text=">=" />
+                                                        <option value=">" text=">" />
+                                                        <option value="&lt;=" text="&lt;=" />
+                                                        <option value="&lt;" text="&lt;" />
+                                                    </aura:if>
+                                        </lightning:select>
+                                    <!--
+                                    <ui:inputSelect value="{!filter.selOperation}" change="{!c.onFiltersChange}">
+                                        <aura:if isTrue="{!filter.selFieldType == 'dimension'}">
+                                            <ui:inputSelectOption text="matches" label="matches" />
+                                            <ui:inputSelectOption text="in" label="in" />
+                                        </aura:if>
+                                        <aura:if isTrue="{!filter.selFieldType == 'measure'}">
+                                            <ui:inputSelectOption text="not in" label="not in" />
+                                            <ui:inputSelectOption text="==" label="==" />
+                                            <ui:inputSelectOption text="!=" label=">=" />
+                                            <ui:inputSelectOption text=">" label=">" />
+                                            <ui:inputSelectOption text="&lt;=" label="&lt;=" />
+                                            <ui:inputSelectOption text="&lt;" label="&lt;" />
+                                        </aura:if>
+                                    </ui:inputSelect>
+                                -->
+                                </td>
+
+                                <td>
+                                        <lightning:select name="{!idx}" variant="label-hidden" value="{!filter.selFieldName}" onchange="{!c.onFiltersChange}">
+                                                <option value="" text="-- None --"/>
+                                                <aura:iteration items="{!v.selObjectDef.fields}" var="fld">
+                                                        <option value="{!fld.name}" text="{!fld.label}" />
+                                                    </aura:iteration>
+                                        </lightning:select>
+                                    <!--
+                                    <ui:inputSelect labelClass="{!idx}" value="{!filter.selFieldName}" change="{!c.onFiltersChange}">
+                                        <ui:inputSelectOption text="" label="- None -" />
+                                        <aura:iteration items="{!v.selObjectDef.fields}" var="fld">
+                                            <ui:inputSelectOption text="{!fld.name}" label="{!fld.label}" />
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                    -->
+                                </td>
+
+                                <td>
+                                        <lightning:input type="checkbox" checked="{!filter.selectionFlag}"  onchange="{!c.onFiltersChange}"/>
+                                        <!--
+                                        <ui:inputCheckbox aura:id="checkbox" value="{!filter.selectionFlag}" change="{!c.onFiltersChange}"/>
+                                        -->
+                                </td>
+
+                                <td>
+                                    <lightning:buttonIcon iconName="utility:delete" size="large" variant="bare" title="{!idx}" onclick="{!c.deleteFilter}"
+                                        alternativeText="Delete Filter" />
+                                </td>
+                            </tr>
+                        </aura:iteration>
+
+                    </table>
+                    <div class="slds-grid slds-grid_align-center slds-p-top_medium">
+                        <lightning:button variant="brand" label="Add" title="Add a filter" onclick="{! c.addFilter }" />
+                    </div>
+                </fieldset>
+            </div>
+
+            <fieldset class="slds-box slds-theme--default">
+                <legend class="slds-text-heading--medium ">
+                    <span style="font-weight:bold">3. Get your filter JSON</span>
+                </legend>
+                <div aura:id="jsonContainer" id="jsonContainer">
+                    <textarea readonly="true" type="text" value="" id="filterJSON" style="margin-top: 0px; margin-bottom: 0px; width:800px; height: 200px;"
+                    >
+
+                    </textarea>
+                    <div aura:id="copyButton" id="copyButton">
+                            <lightning:buttonIcon iconName="utility:copy" size="large" variant="bare" onclick="{! c.copyJSON }" alternativeText="Copy to Clipboard"
+                            />
+                        </div>
+                </div>
+            </fieldset>
+
+        </div>
+
+        <iframe class="vfcomp" src="{!'/apex/PSGetSessionIdVF'}" width="0px" height="0px" frameBorder="0" />
+    </lightning:card>
+</aura:component>
