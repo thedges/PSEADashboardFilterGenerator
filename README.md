@@ -21,10 +21,6 @@ Go to <b>Setup > Remote Site Settings</b> can create a new entry like following.
 
 ![alt text](https://github.com/thedges/PSEADashboardFilterGenerator/blob/master/remote-site.png "Sample Image")
 
-<b>WARNING:</b> One issue is noted with the tool so far. If you create one of more field filters and then delete them all, you will get an error like below the next time you try to create and configure a new field filter. For now until I can figure this out, just refresh the page to reload the component to get rid of this.
-
-![alt text](https://github.com/thedges/PSEADashboardFilterGenerator/blob/master/error.png "Sample Image")
-
 <a href="https://githubsfdeploy.herokuapp.com">
   <img alt="Deploy to Salesforce"
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
