@@ -176,7 +176,14 @@
 
 			}
 
-			filterJSON.value = JSON.stringify(json);
+            if (component.get("v.prettyPrint"))
+            {
+                filterJSON.value = JSON.stringify(json, null, 2);
+            }
+            else
+            {
+			  filterJSON.value = JSON.stringify(json);
+            }
 		}
 		else
 		{

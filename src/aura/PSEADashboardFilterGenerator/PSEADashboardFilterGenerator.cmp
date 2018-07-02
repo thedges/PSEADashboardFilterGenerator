@@ -23,6 +23,7 @@
     <aura:attribute name="selIndex" type="String" />
 
     <aura:attribute name="sessionId" type="String" />
+    <aura:attribute name="prettyPrint" type="Boolean" default="false"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     
@@ -283,6 +284,9 @@
                 <legend class="slds-text-heading--medium ">
                     <span style="font-weight:bold">3. Get your filter JSON</span>
                 </legend>
+                <div class="slds-p-bottom_small">
+                    <lightning:input type="checkbox" label="Pretty-print output for JSON?" checked="{!v.prettyPrint}"  onchange="{!c.onFiltersChange}"/>
+                </div>
                 <div aura:id="jsonContainer" id="jsonContainer">
                     <textarea readonly="true" type="text" value="" id="filterJSON" style="margin-top: 0px; margin-bottom: 0px; width:800px; height: 200px;"
                     >
