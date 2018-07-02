@@ -59,9 +59,12 @@
         </aura:if>
 
         <div class="slds-p-around_medium">
-            <div class="slds-p-bottom_large" style="text-align: center;">
+            <div style="text-align: center;">
             <span style="font-family: 'Salesforce Sans',Arial,sans-serif;font-weight: bold;color:#00a0de;font-size: 1.25rem;">EA Dashboard Filter Generator</span>
            </div>
+            <div class="slds-p-bottom_large" style="text-align: center;">
+                <span style="color:#BEBEBE;">(<a href="https://help.salesforce.com/articleView?id=bi_embed_lightning.htm" target="_blank">dashboard embedding and JSON filter documentation</a>)</span>
+            </div>
             <div class="slds-p-bottom_large">
                 <fieldset class="slds-box slds-theme--default ">
                     <legend class="slds-text-heading--medium ">

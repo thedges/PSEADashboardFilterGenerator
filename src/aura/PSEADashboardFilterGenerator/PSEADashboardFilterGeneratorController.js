@@ -176,13 +176,14 @@
 
 			}
 
+            var regex = new RegExp('"', 'g');
             if (component.get("v.prettyPrint"))
             {
-                filterJSON.value = JSON.stringify(json, null, 2);
+                filterJSON.value = JSON.stringify(json, null, 2).replace(regex, '\'');
             }
             else
             {
-			  filterJSON.value = JSON.stringify(json);
+			  filterJSON.value = JSON.stringify(json).replace(regex, '\'');
             }
 		}
 		else

@@ -21,3 +21,11 @@
     display : none;
     visibility : hidden;
 }
+
+.THIS a:visited {
+    color: #BEBEBE;
+}
+
+.THIS a:link {
+    color: #BEBEBE;
+}
