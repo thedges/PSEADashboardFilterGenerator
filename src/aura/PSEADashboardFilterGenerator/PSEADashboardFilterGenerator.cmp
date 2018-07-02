@@ -81,7 +81,7 @@
                             </lightning:select>
                         </div>
                         <div class="slds-col">
-                            <lightning:select name="objectSel" label="Select a object:" value="{!v.selObjectName}">
+                            <lightning:select name="objectSel" label="Select an object:" value="{!v.selObjectName}">
                                 <option value="">-- None --</option>
                                 <aura:iteration items="{!v.objects}" var="obj">
                                     <option value="{!obj.name}" text="{!obj.label}"></option>
