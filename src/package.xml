@@ -20,5 +20,9 @@
         <members>Dashboard_Filter_Generator</members>
         <name>FlexiPage</name>
     </types>
+    <types>
+        <members>EA_Filter_Gen</members>
+        <name>PermissionSet</name>
+    </types>
     <version>42.0</version>
 </Package>
