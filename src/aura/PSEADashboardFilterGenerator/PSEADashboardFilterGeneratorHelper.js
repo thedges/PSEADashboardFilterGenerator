@@ -197,10 +197,15 @@
         var dotarr = arr[2].split(".");
         
         var vfOrigin = "https://" + dotarr[0] + ".my.salesforce.com";
+        console.log('vfOrigin=' + vfOrigin);
+        
         window.addEventListener("message", function(event) {
             if (event.origin !== vfOrigin) {
                 // Not the expected origin: Reject the message!
-                return;
+                console.log('Event origin does not match VF page origin');
+                console.log('  > event.origin = ' + event.origin);
+                console.log('  > vfOrigin = ' + vfOrigin);
+                //return;
             }
             // Only handle messages we are interested in
             if (event.data.name === "PSWaveDashboardFilterGenerator") {
