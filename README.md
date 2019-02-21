@@ -1,7 +1,7 @@
 # PSEADashboardFilterGenerator
 A utility Lightning Component to help generate the JSON filter for the "Wave Dashboard" Lightning Component that comes standard with Salesforce.
 
-![alt text](https://github.com/thedges/PSEADashboardFilterGenerator/blob/master/PSEADashboardFilterGenerator.png "Sample Image")
+![alt text](https://github.com/thedges/PSEADashboardFilterGenerator/blob/master/PSEADashboardFilterGenerator.gif "Sample Image")
 
 ## Setup
   1. Install the package from the <b>Deploy to Salesforce</b> button below
