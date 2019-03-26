@@ -1,4 +1,6 @@
 # PSEADashboardFilterGenerator
+THIS SOFTWARE IS COVERED BY [THIS DISCLAIMER](https://raw.githubusercontent.com/thedges/Disclaimer/master/disclaimer.txt).
+
 A utility Lightning Component to help generate the JSON filter for the "Wave Dashboard" Lightning Component that comes standard with Salesforce.
 
 ![alt text](https://github.com/thedges/PSEADashboardFilterGenerator/blob/master/PSEADashboardFilterGenerator.gif "Sample Image")
